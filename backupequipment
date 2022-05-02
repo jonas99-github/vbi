@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html>
+<head><title>Verzontal Equip. Monitoring</title>
+<?php include ("header.php");
+$emp_no=$_GET['emp_no'];
+$sql="SELECT *FROM empl_tbl WHERE empl_no='$emp_no'";
+$result=$conn->query($sql);
+$row = $result->fetch_assoc();
+$emp_fname = $row['empl_firstname'];
+$emp_middlename = $row['middlename'];
+$empl_lastname = $row['empl_lastname'];
+$position=$_SESSION['SESS_ROLE'];
+$act=$_GET['action'];
+$selaction=$_GET['selaction'];
+$section=$_GET['section'];
+?>
+<script type="text/javascript">
+function handleempl(elm)
+{
+  window.location ="about.php?section=equipment&action=transfer&emp_no=<?php echo $emp_no;?>&selaction="+elm.value;
+}
+</script>
+</style>
+</head>
+<body>
+<!--*HR GENERALIST-->
+  <?php
+  if($position=='HR Generalist'){
+  ?>
+  <div class="first-header">
+    <ul>
+    <a href="dashboard.php" style="float:left; margin-top:3px;margin-left:6px;"><img src="icon/logo.png" alt="logo" height="45" width="140" id="imgnav"></a>
+      <li>
+        <div id="searchdiv-form" style="float:left;margin-top:-1px;margin-left:16px;">
+          <section style="float:left;">
+        <form id="search-form" action="search-emp-session.php" method="POST" class="">
+        <input type="text" id="search-input" name="q" style="border-radius: 5px;" class="class-form" placeholder="Search employee" value="<?php  echo isset($_GET['q']) ? $_GET['q'] : null; ?>">
+        <input type="submit" name="submit-button" value="Search" class="btn btn-info" style="width:80px;">
+      </form>
+    </section>
+    <?php
+    if(isset($a)){
+      ?>
+    <section style="float:left;">
+      <form id="clear-search" action="search.php" method="POST">
+        <input type="submit" name="submit" style="margin-left:3px;" value="Clear search" class="btn btn-danger">
+      </form>
+    </section>
+    <?php
+  }
+   ?>
+    </div>
+      </li>
+      <li><a href="search.php">Employees</a></li>
+      <li><a href="manage_empl.php">Manage Employee</a><li>
+      <li style="float:right "><a href="logout.php">LOGOUT</a></li>
+      <li style="float:right; margin-right:20px;"><?php echo $_SESSION['SESS_ROLE'] ."   "; ?></li>
+  </ul>
+  </div>
+
+ <div class="profile-nav">
+ <ul>
+ <li><a href="timeline.php?emp_no=<?php echo $_GET['emp_no']; ?>">Timeline</a></li>
+ <li><a href="about.php?section=overview&action=&selaction=&overview&emp_no=<?php echo $_GET['emp_no']; ?>">About</a><li>
+ </ul>
+ </div>
+
+ <div class="about-div">
+ <h3>About</h3>
+ </div>
+
+ <div class="profile-sidenav-about">
+ <center><h1>PROFILE</h1></center>
+ <img src="icon/prsn2.jpg" height="90" width="90" id="imgprof">
+ <?php
+ $sql4="SELECT*FROM empl_tbl WHERE empl_no='$emp_no'";
+ $result4=$conn->query($sql4);
+ $row4=$result4->fetch_assoc();
+ $show_fname=$row4['empl_firstname'];
+ $show_mname=$row4['middlename'];
+ $show_lname=$row4['empl_lastname'];
+ $sql5="SELECT*FROM empl_tbl INNER JOIN dept_tbl on empl_tbl.dept_id=dept_tbl.dept_id WHERE empl_no='$emp_no'";
+ $result5=$conn->query($sql5);
+ $row5=$result5->fetch_assoc();
+ ?>
+ <center><h3><?php echo $show_fname; echo " ";echo  $show_mname; echo " "; echo $show_lname;?></h3></center>
+ <ul class="mainmenu">
+ <li><a href="about.php?section=overview&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Overview</a></li>
+ <li><a href="about.php?section=employee&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Employee</a></li>
+ <li><a href="about.php?section=equipment&selaction=&action=&emp_no=<?php echo $_GET['emp_no'];?>">Equipment</a></li>
+ <li><a href="about.php?section=deployment_history&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Deployment</a></li>
+ </ul>
+ </nav>
+ </div>
+ <?php
+ $section=$_GET['section'];
+ if($section=='overview'){
+ ?>
+ <div class="aboutcontent-div">
+   <label>Employee Number: </label><label class="en"><strong><?php echo $row4['empl_no'];?></strong></label><br><br>
+   <label>Position: </label><label class="pos">
+   <strong>
+     <?php
+   $pos3=$row4['position'];
+   $sql19="SELECT*FROM position WHERE pos_id='$pos3'";
+   $result19=mysqli_query($conn,$sql19);
+   while($row19=mysqli_fetch_assoc($result19)){
+   echo $row19['position'];
+ }
+   ?>
+ </strong></label><br><br>
+   <label>Department: </label><label class="dt"><strong><?php echo $row5['dept_name'];?></strong></label><br><br>
+   <label>Deployment: </label><label class="dp"><strong><?php echo $row5['deploy'];?></strong></label><br><br>
+   <?php
+   $sql7="SELECT*FROM eq_inv WHERE empl_no='$emp_no'";
+   $result7=$conn->query($sql7);
+   $row7=$result7->fetch_assoc();
+   ?>
+ <label>Equipment assigned to employee: <br><?php
+   $sql6="SELECT*FROM eq_inv WHERE empl_no='$emp_no'";
+ $result6=mysqli_query($conn, $sql6);
+ while($row6 = mysqli_fetch_assoc($result6)){
+  ?><strong><?php echo "-".$row6['eqdesc'];?></strong></label><br><?php
+ }
+   ?><br>
+</div>
+ <?php
+ }
+ elseif($section=='employee'){
+ ?>
+ <div class="aboutcontent-div">
+   <?php
+
+   $sql3="SELECT * FROM empl_tbl  WHERE empl_no='$emp_no'";
+   $result3=mysqli_query($conn,$sql3);
+   while($row3=mysqli_fetch_assoc($result3)){
+     ?>
+     <label>Employee Number: </label><label style="margin-left:39px;"><strong><?php echo $row3['empl_no'];?></strong></label><br>
+     <label>First Name: </label><label class="fn"><strong><?php echo $row3['empl_firstname'];?></strong></label><br>
+     <label>Middle Name: </label><label class="mn"><strong><?php echo $row3['middlename'];?></strong></label><br>
+     <label>Last Name: </label><label class="ln"><strong><?php echo $row3['empl_lastname'];?></strong></label><br><br>
+     <label>Status: </label><label class="sts"><strong><?php echo $row3['empl_status'];?></strong></label><br>
+     <label>Position: </label>
+     <?php
+     $pos2=$row5['position'];
+     $sql18="SELECT*FROM position WHERE pos_id='$pos2'";
+     $result18=mysqli_query($conn,$sql18);
+     while($row18=mysqli_fetch_assoc($result18)){
+       ?>
+    <label class="ps"><strong><?php echo $row18['position'];?></strong></label><br>
+     <?php
+   }
+   ?><br>
+    <label>Department: </label>
+    <?php
+   $dept2=$row3['dept_id'];
+   $sql14="SELECT*FROM dept_tbl WHERE dept_id='$dept2'";
+   $result14=mysqli_query($conn,$sql14);
+   while($row14=mysqli_fetch_assoc($result14)){
+    ?>
+    <label class="dept"><strong><?php echo $row14['dept_name'];?></strong></label><br>
+     <?php
+   }
+    ?><br>
+     <label>Deployment/Location: </label><label class="dep"><strong><?php echo $row3['deploy'];?></strong></label><br>
+     <label>Date Hired:</label><label class="hd"><?php echo $row3['hired'];?></strong></label><br><br>
+     <label>Profile creation date:</label><label style="margin-left:31px;"><?php echo $row3['date_created'];?></label><br><br>
+     <label>Remarks/Comments:</label><label style="margin-left:30px;background-color:#ccc;"><?php echo $row3['remarks_prof'];?></label><br><br>
+
+ <?php
+ }
+  ?>
+   <a href="employee.php?emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary">Edit information</button></a>
+   </div>
+
+ <?php
+ }
+ elseif($section=='equipment'){
+ ?>
+ <center><div class="aboutcontent-div">
+ <br>
+ <table id="prof-equip">
+ <tr>
+ <th>ID</th>
+ <th>Description</th>
+ <th>Brand</th>
+ <th>Tag no</th>
+ <th>Serial no</th>
+ <th>Model no</th>
+ <th>IP add</th>
+ <th>State</th>
+ <th>Condition</th>
+ <th>Date Issued</th>
+ <th>Date Purchased</th>
+ <th>Price</th>
+ <th>Location</th>
+ <th>Remarks</th>
+   <?php
+   if($position=='IT Admin'){
+     ?>
+   <th>Action</th>
+   <?php
+ }
+  ?>
+ </tr>
+ <?php
+ $sql2="SELECT * FROM eq_inv WHERE empl_no='$emp_no'";
+ $result2=mysqli_query($conn, $sql2);
+ while($row2 = mysqli_fetch_assoc($result2)){
+  ?>
+  <tbody>
+    <td><?php echo $row2['eq_inv_id']; ?></td>
+    <td style="font-size:20px;"><strong><?php echo $row2['eqdesc']; ?></strong></td>
+    <td><?php echo $row2['brand']; ?></td>
+    <td><?php echo $row2['tag_no']; ?></td>
+    <td><?php echo $row2['serial_no']; ?></td>
+    <td><?php echo $row2['model_no']; ?></td>
+    <td><?php echo $row2['ip_add']; ?></td>
+    <td><?php echo $row2['eq_state']; ?></td>
+    <td style="color:red;"><strong><?php echo $row2['eq_condition']; ?></strong></td>
+    <td><?php echo $row2['date_issued']; ?></td>
+    <td><?php echo $row2['date_purch']; ?></td>
+    <td><?php echo $row2['price']; ?></td>
+    <td><?php echo $row2['curr_equip_loc']; ?></td>
+    <td><?php echo $row2['remarks']; ?></td>
+ </tbody>
+   <?php
+    }
+    ?>
+   </table><br>
+   <?php
+         if($position=='Admin Staff'){
+           ?>
+      <a href="codegenerate.php"><button class="btn btn-primary" style="float:left">Assign equipment</button></a>
+   <?php
+       }
+       if($position=='IT Admin'){
+         ?>
+         <a href="codegenerate.php"><button class="btn btn-primary" style="float:left">Assign equipment</button></a>
+       <?php
+         }
+         ?>
+ </div></center>
+ <div style="background-color:#1abc9c; padding:10px;margin-top:40px;margin-left:290px;margin-right:100px;margin-bottom:-20px;font-size:20px;font-family:arial;border-top-left-radius: 3px;
+ 	border-top-right-radius:3px; color:maroon;"><strong>Issued Equipment</strong></div>
+ <div class="content-divitadmin"><br>
+   <h3 style="text-align:center;">Property Acknowledgement Receipt/Memorandum Receipt</h3><br>
+ <br>                    <table class="content-divitadmin">
+       <tr>
+         <th>UNIQUE ID</th>
+         <th>PAR NUMBER</th>
+         <th>DATE ISSUED</th>
+       </tr>
+       <?php
+         $sql12="SELECT * FROM prty_ackn_rcpt WHERE transfer_empl_no='$emp_no' GROUP BY par_no ORDER BY par_id DESC";
+         $result12=mysqli_query($conn, $sql12);
+         while($row12=mysqli_fetch_assoc($result12)){
+           ?>
+       <tbody>
+         <td><?php echo $row12['par_id'];?></td>
+         <td><a href="viewpar.php?par=<?php echo $row12['par_no'];?>"><?php echo $row12['par_no'];?></td>
+           <td><?php echo $row12['dateissued'];?></td>
+         </tbody>
+         <?php
+       }
+        ?>
+       </table>
+ </div>
+ <?php
+ }
+ elseif($section=='equipment_history'){
+ ?>
+ <center><div class="aboutcontent-div">equipment history</div></center>
+ <?php
+ }
+ elseif($section=='deployment_history'){
+ ?>
+<div class="aboutcontent-div">
+  <?php
+  $sql8="SELECT * FROM empl_tbl WHERE empl_no='$emp_no'";
+  $result8=mysqli_query($conn,$sql8);
+  while($row8=mysqli_fetch_assoc($result8)){
+    ?>
+    <br><br>
+    <?php
+
+      $a = isset($_SESSION['transfer_sess']) ? $_SESSION['transfer_sess'] : null;
+      $transfer=isset($_SESSION['transfer_sess']) ? $_SESSION['transfer_sess'] : null;
+
+      //transferID
+      function createRandomtransferID() {
+        $chars = "003232303232023232023456789";
+        srand((double)microtime()*1000000);
+        $i = 0;
+        $pass = '' ;
+        while ($i <= 7) {
+          $num = rand() % 33;
+          $tmp = substr($chars, $num, 1);
+          $pass = $pass . $tmp;
+          $i++;
+        }
+        return $pass;
+      }
+      $transferID='TID-'.createRandomtransferID();
+      ?>
+  Current employee's deployment/location:<strong><?php echo " ".$row8['deploy'];?></strong><br><br><br>
+    <label>Change employee's deployment below:</label>
+  <div style="border-style:solid;border-width:2px;border-color:black;margin-top:10px;margin-left:90px;margin-right:90px;padding-bottom:100px;padding:10px;">
+    <form action="saveeditdeploy.php" method="POST"><br>
+      <input type="hidden" name="transferID" value="<?php echo $transferID;?>">
+    <input type="hidden" name="emp2" value="<?php echo $emp_no;?>">
+    <span>Deployment ID </span><input type="text" id="deploy_id" value="<?php echo $transfer;?>" name="id" style="background-color:#ccc;" readonly><br><br>
+    <span>Deployment </span><br>
+    <select id="deployment" name="deploy" onchange="window.location='transfer-deploy.php?emp=<?php echo $emp_no;?>&val='+this.value" class="form-control">
+
+      <?php
+    $sql11="SELECT * FROM Deployment WHERE deply_id='$transfer'";
+    $result11=mysqli_query($conn,$sql11);
+    while($row11=mysqli_fetch_assoc($result11)){
+      ?>
+        <option><?php echo $row11['deployment'];?></option>
+        <?php
+      }
+      ?>
+      <option></option>
+      <?php
+        $sql10="SELECT * FROM Deployment";
+        $result10=mysqli_query($conn, $sql10);
+        while($row10 = mysqli_fetch_assoc($result10)){
+        ?>
+          <option value="<?php echo $row10['deply_id'];?>"><?php echo $row10['deployment']; ?></option>
+          <?php
+        }
+        ?>
+      </select><br><br>
+    <span>Date changed </span><br><input type="date" name="date_changed" style="width:267px;height:30px;" required><br><br>
+    <input type="submit" name="submit"  class="btn btn-primary" style="height:30px;" value="Change deployment">
+</form>
+<?php
+}
+ ?>
+</div>
+<br><br>
+ </div>
+ <div style="background-color:white;padding-bottom:100%;margin-top:20px;margin-left:290px;margin-right:100px;" id="transferdiv"><h1 style="text-align:center;">Deployment Changes History</h1><br>
+
+ <table>
+   <tr>
+     <th>ID</th>
+     <th>Deployment changes</th>
+     <th>Date</th>
+     <th>Remark</th>
+     <th>Action</th>
+   </thead>
+
+   <?php
+   $sql20="SELECT * FROM deploy_transfer WHERE emplNo_transfer='$emp_no' ORDER BY idTransfer DESC";
+   $result20=mysqli_query($conn,$sql20);
+   while($row20=mysqli_fetch_assoc($result20)){
+     ?>
+<form method="POST" action="transfer_remark.php#transferdiv" id="transferForm">
+        <tr>
+          <td>
+            <?php echo $row20['transferID'];?>
+          </td>
+          <td>
+            <?php echo $row20['newDeployment'];?>
+          </td>
+          <td>
+            <?php echo $row20['transferDate'];?>
+          </td>
+          <td>
+            <input type="hidden" name="idtransfer" value="<?php echo $row20['transferID'];?>">
+            <input type="hidden" name="empl_transfer" value="<?php echo $emp_no;?>">
+            <textarea name="remarktransfer"><?php echo $row20['remarkTransfer'];?></textarea>
+          </td>
+          <td>
+            <button name="transferButton" class="btn btn-primary" style="height:50px;width:65px;font-size:11px;" value="<?php echo $row20['remarkTransfer'];?>" /><strong>UPDATE<br>REMARK</strong></button>
+          </td>
+        </tr>
+    </form>
+          <?php } ?>
+
+      </table>
+
+      </div>
+ <?php
+ }
+}
+ elseif($section=='par'){
+ ?>
+ <center><div class="aboutcontent-div">property acknowledgment receipt</div></center>
+<?php
+}
+
+                                              // *ADMIN STAFF
+if($position=='Admin Staff'){
+          ?>
+          <div class="first-header-astaff">
+            <ul>
+              <li><a href="equip_assign.php">Equipment Assignments</a></li>
+              <li><a href="equipment.php">Equipment Inventory</a></li>
+          <li><a href="">Monitoring</a></li>
+          <li><a href="">Activity Log</a></li>
+          <li style="float:right "><a href="logout.php">LOGOUT</a></li>
+          <li style="float:right; margin-right:20px;"><?php echo "Welcome " . $_SESSION['SESS_ROLE'];?></li>
+          </ul>
+          </div>
+        <?php }
+
+                                                // *HR AND ADMIN MANAGER
+if($position=='HR and Admin Manager'){
+?>
+<div class="first-header">
+  <ul>
+    <a href="dashboard.php"><img src="icon/logo.png" alt="logo" height="45" width="140" id="imgnav"></a>
+    <li><input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search.." title="Type in a name"></li>
+    <li><a href="dashboard.php">Employees</a></li>
+    <li><a href="equipment.php">Equipment Inventory</a></li>
+    <li><a href="monitoring.php">Monitoring</a><li>
+    <li><a href="reorder.php">Make Reorder Request</a><li>
+    <li><a href="users.php">Accounts</a></li>
+    <li style="float:right "><a href="logout.php">LOGOUT</a></li>
+    <li style="float:right; margin-right:20px;"><?php echo $_SESSION['SESS_ROLE'] ."   "; ?></li>
+</ul>
+</div>
+
+<div class="profile-nav">
+<ul>
+<li><a href="timeline.php?emp_no=<?php echo $_GET['emp_no']; ?>">Timeline</a></li>
+<li><a href="about.php?section=overview&emp_no=<?php echo $_GET['emp_no']; ?>">About</a><li>
+</ul>
+</div>
+
+<div class="about-div">
+<h3 style="float:left;">About</h3>
+</div>
+
+<div class="profile-sidenav-about">
+<center><h1>PROFILE</h1></center>
+<img src="icon/prsn2.jpg" height="150" width="150" id="imgprof">
+<?php
+$sql4="SELECT*FROM empl_tbl WHERE empl_no='$emp_no'";
+$result4=$conn->query($sql4);
+$row4=$result4->fetch_assoc();
+$show_fname=$row4['empl_firstname'];
+$show_mname=$row4['middlename'];
+$show_lname=$row4['empl_lastname'];
+$sql5="SELECT*FROM empl_tbl INNER JOIN dept_tbl on empl_tbl.dept_id=dept_tbl.dept_id WHERE empl_no='$emp_no'";
+$result5=$conn->query($sql5);
+$row5=$result5->fetch_assoc();
+?>
+<center><h3><?php echo $show_fname; echo " ";echo  $show_mname; echo " "; echo $show_lname;?></h3></center>
+<ul class="mainmenu">
+<li><a href="about.php?section=overview&emp_no=<?php echo $_GET['emp_no'];?>">Overview</a></li>
+<li><a href="about.php?section=employee&emp_no=<?php echo $_GET['emp_no'];?>">Employee</a></li>
+<li><a href="about.php?section=equipment&action=&selaction=emp_no=<?php echo $_GET['emp_no'];?>">Equipment</a></li>
+<li><a href="about.php?section=deployment_history&emp_no=<?php echo $_GET['emp_no'];?>">Deployment</a></li>
+</ul>
+</nav>
+</div>
+<?php
+$section=$_GET['section'];
+if($section=='overview'){
+?>
+<div class="aboutcontent-div"><br>
+<label>Employee Number: </label><label class="en"><strong><?php echo $row4['empl_no'];?></strong></label><br><br>
+<label>Position: </label><label class="pos"><strong><?php echo $row4['position'];?></strong></label><br><br>
+<label>Department: </label><label class="dt"><strong><?php echo $row5['dept_name'];?></strong></label><br><br>
+<label>Deployment: </label><label class="dp"><strong><?php echo $row5['deploy'];?></strong></label><br><br>
+<label>Equipment assigned to employee: <br><?php
+$sql6="SELECT*FROM eq_inv INNER JOIN eq_desc on eq_inv.eq_desc_id=eq_desc.eq_desc_id WHERE empl_no='$emp_no'";
+$result6=mysqli_query($conn, $sql6);
+while($row6 = mysqli_fetch_assoc($result6)){
+?><strong><?php echo "-".$row6['eqdesc'];?></strong></label><br><?php
+}
+?><br>
+</div>
+<div class="aboutcontent-div2">
+  <?php
+  $sql7="SELECT*FROM eq_inv WHERE empl_no='$emp_no'";
+  $result7=$conn->query($sql7);
+  $row7=$result7->fetch_assoc();
+  ?><br><br>
+<h2 style="text-align:center;"><strong>Property Acknowledgement Receipt(s)<strong></h2>
+
+    <label class="pr"><a href="viewpar.php"><strong><?php echo $row7['par'];?></strong></a></label><br><br>
+</div>
+<?php
+}
+elseif($section=='employee'){
+?>
+<div class="aboutcontent-div">
+<?php
+$sql3="SELECT * FROM empl_tbl INNER JOIN dept_tbl on empl_tbl.dept_id=dept_tbl.dept_id WHERE empl_no='$emp_no'";
+$result3=$conn->query($sql3);
+$row3=$result3->fetch_assoc();
+?>
+<label>First Name: </label><label class="fn"><strong><?php echo $row3['empl_firstname'];?></strong></label><br>
+<label>Middle Name: </label><label class="mn"><strong><?php echo $row3['middlename'];?></strong></label><br>
+<label>Last Name: </label><label class="ln"><strong><?php echo $row3['empl_lastname'];?></strong></label><br><br>
+<label>Status: </label><label class="sts"><strong><?php echo $row3['empl_status'];?></strong></label><br>
+<label>Position: </label><label class="ps"><strong><?php echo $row3['position'];?></strong></label><br>
+<label>Department: </label><label class="dept"><strong><?php echo $row3['dept_name'];?></strong></label><br>
+<label>Deployment/Location: </label><label class="dep"><strong><?php echo $row3['deploy'];?></strong></label><br>
+<label>Date Hired:</label><label class="hd"><?php echo $row3['hired'];?></strong></label><br><br>
+<label>Profile creation date:</label><label style="margin-left:31px;"><?php echo $row3['date_created'];?></label><br><br>
+<label>Remarks/Comments:</label><label style="margin-left:31px;"><?php echo $row3['remarks_prof'];?></label><br><br>
+<a href="employee.php?emp_no=<?php echo $emp_no;?>"><button>Edit information</button></a>
+</div>
+<?php
+}
+elseif($section=='equipment'){
+?>
+<center><div class="aboutcontent-div">
+<br>
+<div id="prof-equip">
+<table id="prof-equip">
+<tr>
+<th>ID</th>
+<th>Description</th>
+<th>Tag no</th>
+<th>Serial no</th>
+<th>Model no</th>
+<th>IP add</th>
+<th>State</th>
+<th>Condition</th>
+<th>Date Issued</th>
+<th>Date Purchased</th>
+<th>Price</th>
+<th>Location</th>
+<th>Remarks</th>
+<th></th>
+</tr>
+<?php
+$sql2="SELECT * FROM eq_inv INNER JOIN eq_desc on eq_inv.eq_desc_id=eq_desc.eq_desc_id WHERE empl_no='$emp_no'";
+$result2=mysqli_query($conn, $sql2);
+while($row2 = mysqli_fetch_assoc($result2)){
+?>
+<tbody>
+ <td><?php echo $row2['eq_inv_id']; ?></td>
+ <td><?php echo $row2['eqdesc']; ?></td>
+ <td><?php echo $row2['tag_no']; ?></td>
+ <td><?php echo $row2['serial_no']; ?></td>
+ <td><?php echo $row2['model_no']; ?></td>
+ <td><?php echo $row2['ip_add']; ?></td>
+ <td><?php echo $row2['eq_state']; ?></td>
+ <td><?php echo $row2['eq_condition']; ?></td>
+ <td><?php echo $row2['date_issued']; ?></td>
+ <td><?php echo $row2['date_purch']; ?></td>
+ <td><?php echo $row2['price']; ?></td>
+ <td><?php echo $row2['curr_equip_loc']; ?></td>
+ <td><?php echo $row2['remarks']; ?></td>
+ <td><a href="">View</td>
+</tbody>
+ <?php
+  }
+  ?>
+ </table><br>
+</div><br>
+<button style="float:left;">Request for equipment transfer</button>
+ <br><br><br><br><br><br><br><br><br><br><br>
+ <h2>Issued Equipment</h2>
+     <h5>Property Acknowledgement Receipt/Memorandum Receipt</h5>
+</div></center>
+<?php
+}
+elseif($section=='deployment_history'){
+?>
+<div id="aboutcontent-div" class="aboutcontent-div">
+  <?php
+  $sql8="SELECT * FROM empl_tbl WHERE empl_no='$emp_no'";
+  $result8=mysqli_query($conn,$sql8);
+  while($row8=mysqli_fetch_assoc($result8)){
+    $d=$row8['deploy'];
+    ?>
+    <br><br>
+  Current employee's deployment/location:<?php echo " ".$row8['deploy'];?>
+  <div id="transferform" style="border-style:solid;border-width:2px;border-color:black;margin-top:50px;margin-left:320px;margin-right:320px;padding-bottom:100px;padding:10px;">
+    <?php
+      $sql9="SELECT * FROM deployment WHERE deployment='$d'";
+      $result9=mysqli_query($conn,$sql9);
+      while($row9=mysqli_fetch_assoc($result9)){
+        ?>
+  <form action="saveeditdeploy.php#transferform" method="POST"><br>
+    <input type="hidden" name="emp2" value="<?php echo $emp_no;?>">
+    <span>Deployment ID </span><input type="text" name="id" value="<?php echo $a;?>" readonly><br><br>
+    <span>Deployment </span><br>
+    <select name="deploy">
+      <?php
+      $sql11="SELECT * FROM Deployment WHERE deployment='$d'";
+      $result11=mysqli_query($conn,$sql11);
+      while($row11=mysqli_fetch_assoc($result11)){
+        ?>
+      <option><?php echo $row11['deployment'];?></option>
+      <?php
+    }
+    ?>
+        <?php
+        $sql10="SELECT * FROM Deployment";
+        $result10=mysqli_query($conn, $sql10);
+        while($row10 = mysqli_fetch_assoc($result10)){
+        ?>
+          <option><?php echo $row10['deployment']; ?></option>
+          <?php
+        }
+        ?>
+      </select><br><br>
+    <span>Date changed </span><br><input type="date" name="date_changed" style="width:267px;height:30px;"><br><br>
+    <input type="submit" name="submit" class="btn btn-primary" value="Change deployment">
+</form>
+<?php
+}
+}
+ ?>
+
+</div>
+<?php
+}
+
+}
+
+  // *IT ADMIN
+
+if($position=='IT Admin'){
+         ?>
+                   <div class="first-header">
+                     <ul>
+                        <a href="dashboard.php" style="float:left; margin-top:3px;margin-left:6px;"><img src="icon/logo.png" alt="logo" height="45" width="140" id="imgnav"></a>
+                       <li>
+                         <div id="searchdiv-form" style="float:left;margin-top:-1px;margin-left:16px;">
+                           <section style="float:left;">
+                         <form id="search-form" action="search-dashboard.php" method="POST" class="">
+                         <input type="text" id="search-input" name="q" style="border-radius: 5px;" class="class-form" placeholder="Search employee" value="<?php  echo isset($_GET['q']) ? $_GET['q'] : null; ?>">
+                         <input type="submit" name="submit-button" value="Search" class="btn btn-info" style="width:80px;">
+                       </form>
+                     </section>
+                     <?php
+                     if(isset($a)){
+                       ?>
+                     <section style="float:left;">
+                       <form id="clear-search" action="dashboard.php" method="POST">
+                         <input type="submit" name="submit" style="margin-left:3px;" value="Clear search" class="btn btn-danger">
+                       </form>
+                     </section>
+                     <?php
+                   }
+                    ?>
+                     </div>
+                       </li>
+                       <li><a href="dashboard.php">Employees</a></li>
+                       <li><a href="equipment.php?section=">Equipment Inventory</a></li>
+                       <li><a href="reorder.php">Make Reorder Request</a><li
+                       <li style="float:right "><a href="logout.php">LOGOUT</a></li>
+                       <li style="float:right; margin-right:20px;"><?php echo $_SESSION['SESS_ROLE'] ."   "; ?></li>
+                   </ul>
+                   </div>
+
+          <div class="profile-nav">
+            <ul>
+            <li><a href="timeline.php?emp_no=<?php echo $_GET['emp_no']; ?>">Timeline</a></li>
+            <li><a href="about.php?section=overview&selaction=&action=&emp_no=<?php echo $_GET['emp_no']; ?>">About</a><li>
+            </ul>
+            </div>
+
+    <div class="about-div">
+    <h3 style="float:left;">About</h3>
+    </div>
+
+    <div class="profile-sidenav-about">
+    <center><h1>PROFILE</h1></center>
+    <img src="icon/person.png" height="90" width="90" id="imgprof">
+      <?php
+      $sql4="SELECT*FROM empl_tbl WHERE empl_no='$emp_no'";
+      $result4=$conn->query($sql4);
+      $row4=$result4->fetch_assoc();
+      $show_fname=$row4['empl_firstname'];
+      $show_mname=$row4['middlename'];
+      $show_lname=$row4['empl_lastname'];
+      $sql5="SELECT*FROM empl_tbl INNER JOIN dept_tbl on empl_tbl.dept_id=dept_tbl.dept_id WHERE empl_no='$emp_no'";
+      $result5=$conn->query($sql5);
+      $row5=$result5->fetch_assoc();
+       ?>
+        <center><h3><?php echo $show_fname; echo " ";echo  $show_mname; echo " "; echo $show_lname;?></h3></center>
+          <ul class="mainmenu">
+            <?php
+            if($section=='overview'){
+              ?>
+            <li style="font-size:20px;"><a href="about.php?section=overview&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>"><strong>Overview</strong></a></li>
+            <?php
+          }
+          else{
+          ?>
+            <li><a href="about.php?section=overview&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Overview</a></li>
+            <?php
+          }
+            if($section=='employee'){
+              ?>
+            <li style="font-size:20px;"><a href="about.php?section=employee&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>"><strong>Employee</strong></a></li>
+            <?php
+          }
+          else{
+          ?>
+            <li><a href="about.php?section=employee&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Employee</a></li>
+            <?php
+          }
+           ?>
+            <?php
+             if($section=='equipment'){
+              ?>
+            <li style="font-size:20px;"><a href="about.php?section=equipment&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>"><strong>Equipment</strong></a></li>
+            <?php
+          }
+          else{
+          ?>
+          <li><a href="about.php?section=equipment&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>">Equipment</a></li>
+          <?php
+        }
+         ?>
+         <?php
+          if($section=='deployment_history'){
+           ?>
+         <li style="font-size:20px;"><a href="about.php?section=deployment_history&action=&selaction=&emp_no=<?php echo $_GET['emp_no'];?>"><strong>Deployment</strong></a></li>
+         <?php
+       }
+       else{
+       ?>
+        <li><a href="about.php?section=&action=&selaction=&section=deployment_history&emp_no=<?php echo $_GET['emp_no'];?>">Deployment</a></li>
+       <?php
+       }
+       ?>
+          </ul>
+        </nav>
+ </div>
+   <?php
+        if($section=='overview'){
+      ?>
+    <div class="aboutcontent-div">
+      <label>Employee Number: </label><label class="en"><strong><?php echo $row4['empl_no'];?></strong></label><br><br>
+      <label>Position: </label><label class="pos">
+      <strong>
+        <?php
+      $pos3=$row4['position'];
+      $sql19="SELECT*FROM position WHERE pos_id='$pos3'";
+      $result19=mysqli_query($conn,$sql19);
+      while($row19=mysqli_fetch_assoc($result19)){
+      echo $row19['position'];
+    }
+      ?>
+    </strong></label><br><br>
+      <label>Department: </label><label class="dt"><strong><?php echo $row5['dept_name'];?></strong></label><br><br>
+      <label>Deployment: </label><label class="dp"><strong><?php echo $row5['deploy'];?></strong></label><br><br>
+      <?php
+      $sql7="SELECT*FROM eq_inv WHERE empl_no='$emp_no'";
+      $result7=$conn->query($sql7);
+      $row7=$result7->fetch_assoc();
+      ?>
+    <label>Equipment assigned to employee: <br><?php
+      $sql6="SELECT*FROM eq_inv WHERE empl_no='$emp_no'";
+    $result6=mysqli_query($conn, $sql6);
+    while($row6 = mysqli_fetch_assoc($result6)){
+     ?><strong><?php echo "-".$row6['eqdesc'];?></strong></label><br><?php
+    }
+      ?><br>
+    <!--  <button class="btn btn-primary">Download employee's information</button> -->
+  </div>
+          <?php
+        }
+        elseif($section=='employee'){
+        ?>
+      <div class="aboutcontent-div">
+        <?php
+
+        $sql3="SELECT * FROM empl_tbl  WHERE empl_no='$emp_no'";
+        $result3=mysqli_query($conn,$sql3);
+        while($row3=mysqli_fetch_assoc($result3)){
+          ?>
+          <label>Employee Number: </label><label style="margin-left:39px;"><strong><?php echo $row3['empl_no'];?></strong></label><br>
+          <label>First Name: </label><label class="fn"><strong><?php echo $row3['empl_firstname'];?></strong></label><br>
+          <label>Middle Name: </label><label class="mn"><strong><?php echo $row3['middlename'];?></strong></label><br>
+          <label>Last Name: </label><label class="ln"><strong><?php echo $row3['empl_lastname'];?></strong></label><br><br>
+          <label>Status: </label><label class="sts"><strong><?php echo $row3['empl_status'];?></strong></label><br>
+          <?php
+          $pos2=$row5['position'];
+          $sql18="SELECT*FROM position WHERE pos_id='$pos2'";
+          $result18=mysqli_query($conn,$sql18);
+          while($row18=mysqli_fetch_assoc($result18)){
+            $posi2=$row18['position'];
+            ?>
+          <label>Position: </label><label class="ps"><strong><?php echo $row18['position'];?></strong></label><br>
+          <?php
+        }
+        if(empty($posi2)){
+          ?>
+          <label>Position: </label><label class="ps"><strong>--</strong></label><br>
+          <?php
+        }
+        $dept2=$row3['dept_id'];
+        $sql14="SELECT * FROM dept_tbl WHERE dept_id='$dept2'";
+        $result14=mysqli_query($conn,$sql14);
+        while($row14=mysqli_fetch_assoc($result14)){
+          $deptn=$row14['dept_name'];
+         ?>
+          <label>Department: </label><label class="dept"><strong><?php echo $row14['dept_name'];?></strong></label><br>
+          <?php
+        }
+        ?>
+
+          <label>Deployment/Location: </label><label class="dep"><strong><?php echo $row3['deploy'];?></strong></label><br>
+          <label>Date Hired:</label><label class="hd"><?php echo $row3['hired'];?></strong></label><br><br>
+          <label>Profile creation date:</label><label style="margin-left:31px;"><?php echo $row3['date_created'];?></label><br><br>
+          <label>Remarks/Comments:</label><label style="margin-left:30px;background-color:#ccc;"><?php echo $row3['remarks_prof'];?></label><br><br>
+
+<?php
+      }
+       ?>
+        </div>
+        <?php
+      }
+      elseif($section=='equipment'){
+    ?>
+      <div class="aboutcontent-div">
+<br>
+<div id="prof-equip">
+  <?php
+        if($position=='Admin Staff'){
+          ?>
+          <a href="codegenerate.php?emp_no=<?php echo $emp_no;?>"><button style="float:left">Assign equipment</button></a>
+  <?php
+      }
+      if($position=='IT Admin'){
+          ?>
+
+          <?php
+          if($act==''){
+            ?>
+              <a href="about.php?section=equipment&action=transfer&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;margin-left:2px;">Transfer equipment</button></a>
+              <a href="about.php?section=equipment&action=remove&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;margin-left:2px;margin-right:2px;">Remove equipment</button></a>
+              <?php
+          }
+          if($act=='transfer'){
+         ?>
+            <a href="canceltransfer.php?section=equipment&action=&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;background-color:red;">Cancel Transfer</button></a>
+            <a href="about.php?section=equipment&action=remove&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;margin-left:2px;margin-right:2px;">Remove equipment</button></a>
+         <?php
+       }
+       if($act=='remove'){
+         ?>
+         <a href="about.php?section=equipment&action=transfer&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;margin-left:2px;">Transfer equipment</button></a>
+         <a href="about.php?section=equipment&action=&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;background-color:red;margin-left:2px;margin-right:2px;">Cancel Remove</button></a>
+         <?php
+       }
+        ?>
+          <a href="codegenerate.php?emp_no=<?php echo $emp_no;?>"><button class="btn btn-primary" style="float:left;margin-right:1px;">Assign equipment</button></a>
+        <br><br><br>
+        <table id="prof-equip">
+        <tr>
+        <th>Action</th>
+        <th>ID</th>
+        <th>PAR NO</th>
+        <th>Description</th>
+        <th>Brand</th>
+        <th>Tag no</th>
+        <th>Serial no</th>
+        <th>Model no</th>
+        <th>IP add</th>
+        <th>State</th>
+        <th>Condition</th>
+        <th>Date Issued</th>
+        <th>Date Purchased</th>
+        <th>Price</th>
+        <th>Location</th>
+        <th>Remarks</th>
+
+                  </tr>
+                  <?php
+                  $sql2="SELECT * FROM eq_inv WHERE empl_no='$emp_no'";
+                  $result2=mysqli_query($conn, $sql2);
+                  while($row2 = mysqli_fetch_assoc($result2)){
+                   ?>
+                   <tbody>
+                        <td>
+                     <?php
+                     if($act=='transfer'){
+                      ?>
+                     <form action="addeq.php" method="POST">
+                       <input type="hidden" name="invid" value="<?php echo $row2['eq_inv_id']; ?>">
+                        <input type="hidden" name="serial" value="<?php echo $row2['serial_no']; ?>">
+                        <input type="hidden" name="emp" value="<?php echo $emp_no; ?>">
+                        <input type="hidden" name="desc" value="<?php echo $row2['eqdesc']; ?>">
+                       <input type="submit" name="submit" value="Add">
+                     </form>
+                       <?php
+                      }
+                       if($act=='remove'){
+                      ?>
+                      <a href="">>Remove</a>
+                      <?php
+                    }
+                      ?>
+                    <a href="updequip.php?emp_no=<?php echo $emp_no;?>&id=<?php echo $row2['eq_inv_id'];?>">Update</a>
+                    </td>
+                    <td><?php echo $row2['eq_inv_id']; ?></td>
+                    <td><?php echo $row2['par']; ?></td>
+                    <td style="font-size:20px;"><strong><?php echo $row2['eqdesc']; ?></strong></td>
+                    <td><?php echo $row2['brand']; ?></td>
+                    <td><?php echo $row2['tag_no']; ?></td>
+                    <td><?php echo $row2['serial_no']; ?></td>
+                    <td><?php echo $row2['model_no']; ?></td>
+                    <td><?php echo $row2['ip_add']; ?></td>
+                    <td><?php echo $row2['eq_state']; ?></td>
+                    <td style="color:red;"><strong><?php echo $row2['eq_condition']; ?></strong></td>
+                    <td><?php echo $row2['date_issued']; ?></td>
+                    <td><?php echo $row2['date_purch']; ?></td>
+                    <td><?php echo $row2['price']; ?></td>
+                    <td><?php echo $row2['curr_equip_loc']; ?></td>
+                    <td><?php echo $row2['remarks']; ?></td>
+                  </tbody>
+                    <?php
+                     }
+                     ?>
+                    </table><br>
+                  </div>
+
+                          <br><br><br>
+                            <div id="transfer" style="border-style:solid;border-width:4px; border-color:black;margin-right:150px;margin-left:150px;">
+
+                                                      <!--TRANSFER-->
+
+                            <form action="savetransfer.php" method="POST" style="margin-bottom:5px;" >
+                              <span>Transfer equipment</span><br><br>
+                              <?php
+                              $sql13="SELECT * FROM addeq_temp WHERE emp_no='$emp_no'";
+                              $result13=mysqli_query($conn,$sql13);
+                              while($row13=mysqli_fetch_assoc($result13)){
+                                echo ">".$row13['invid']."-".$row13['eqdesc']."-".$row13['serial_no']."<br>";
+                                $list=$row13['invid'];
+                              }
+                              ?>
+                               <center>
+                                 <?php
+                                 if(empty($list)){
+                                   echo "<i><label style='color:red; font-size:13px;'>--Add Equipment to Transfer--</label></i><br>";
+                                 }
+                                 ?>
+                                 <label>_______________________________</label></center>
+                              <span>Employee:</span>
+
+                              <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                  <label class="input-group-text" for="inputGroupSelect01">Options</label>
+                                </div>
+                                <select name="employeinfo" style="width:260px;" onchange="javascript:handleempl(this)" required class="custom-select" id="inputGroupSelect01">
+
+                                <?php
+                                $sql17="SELECT*FROM empl_tbl WHERE empl_no='$selaction'";
+                                $result17=mysqli_query($conn,$sql17);
+                                while($row17=mysqli_fetch_assoc($result17)){
+                                  ?>
+                                    <option value="<?php echo $row17['empl_no'];?>"><?php echo $row17['empl_firstname']." ".$row17['middlename']." ".$row17['empl_lastname'];?></option>
+                                      <?php
+                                    }
+                                    ?>
+                                      <option></option>
+                                    <?php
+                              $sql4="SELECT * FROM empl_tbl ORDER BY date_created";
+                              $result4=mysqli_query($conn, $sql4);
+                              for($i=0; $row4 = mysqli_fetch_assoc($result4); $i++){
+                                   ?>
+                                   <option value="<?php echo $row4['empl_no'];?>"><?php echo $row4['empl_firstname']." ".$row4['middlename']." ".$row4['empl_lastname'];?></option>
+                                   <?php
+                                   }
+                                        ?>
+
+                                </select>
+                              </div>
+                              <span>Location:</span>
+                                <?php
+                                $sql15="SELECT*FROM empl_tbl WHERE empl_no='$selaction'";
+                                $result15=mysqli_query($conn,$sql15);
+                                while($row15=mysqli_fetch_assoc($result15)){
+                                  ?>
+                              <input type="text" name="locc" class="form-control" readonly value="<?php echo $row15['deploy'];?>" style="background-color:#ccc;">
+                              <?php
+                            }
+                             ?>
+                          <br><br>
+                              <input type="hidden" name="emp" value="<?php echo $emp_no;?>">
+                                <span>Select Date:</span>
+                                <input type="date" class="form-control" style="width:180px;" name="date_transfered" required><br><br>
+                              <input type="submit" name="submit" class="btn btn-primary" value="Confirm transfer">
+                            </form>
+                            <a href="canceltransfer.php?section=equipment&action=&selaction=&emp_no=<?php echo $emp_no;?>"><button class="btn btn-danger">Clear selection</button></a>
+                          </div>
+                                <?php
+                          }
+                          ?>
+                </div>
+                <div style="background-color:#1abc9c; padding:10px;margin-top:40px;margin-left:290px;margin-right:100px;margin-bottom:-20px;font-size:20px;font-family:arial;border-top-left-radius: 3px;
+                	border-top-right-radius:3px; color:maroon;"><strong>Issued Equipment</strong></div>
+                <div class="content-divitadmin">
+                  <h3 style="text-align:center;">Property Acknowledgement Receipt/Memorandum Receipt</h3><br>
+<br>                    <table class="content-divitadmin">
+                      <tr>
+                        <th>UNIQUE ID</th>
+                        <th>PAR NUMBER</th>
+                        <th>DATE ISSUED</th>
+                      </tr>
+                      <?php
+                        $sql12="SELECT * FROM prty_ackn_rcpt WHERE transfer_empl_no='$emp_no' GROUP BY par_no ORDER BY par_id DESC";
+                        $result12=mysqli_query($conn, $sql12);
+                        while($row12=mysqli_fetch_assoc($result12)){
+                          ?>
+                      <tbody>
+                        <td><?php echo $row12['par_id'];?></td>
+                        <td><a href="viewpar.php?par=<?php echo $row12['par_no'];?>"><?php echo $row12['par_no'];?></td>
+                          <td><?php echo $row12['dateissued'];?></td>
+                        </tbody>
+                        <?php
+                      }
+                       ?>
+                      </table>
+                </div>
+  <?php
+    }
+      elseif($section=='deployment_history'){
+      ?>
+  <div class="aboutcontent-div">
+      <br><br>
+      <?php
+      $sql16="SELECT*FROM empl_tbl WHERE empl_no='$emp_no'";
+      $result16=mysqli_query($conn,$sql16);
+      while($row16=mysqli_fetch_assoc($result16)){
+        ?>
+    Current employee's deployment/location:<strong><?php echo $row16['deploy'];?></strong><br><br>
+    *Coordinate with the HR and Admin Manager or <br> HR Generalist to change Employee's deployment/location
+    <?php
+    }
+  }
+    ?>
+  </div>
+    <?php
+    }
+  ?>
+<div class="footer">(C) 2019 Verzontal Builders Inc.</div>
+</body>
+</html>

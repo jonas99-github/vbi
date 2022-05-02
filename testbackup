@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="./vendor/jquery/jquery.min.js"></script>
+<!--<script src="js/main.js"></script>-->
+</head>
+<body>
+
+  <div id="fini">
+  </div>
+
+<form action="test3.php" method="POST" class="ajax">
+  <div>
+    <input type="text" name="name" placeholder="Your name">
+  </div>
+  <div>
+    <input type="text" name="email" placeholder="Your email">
+  </div>
+<div>
+  <textarea name="message" placeholder="Your message"></textarea>
+</div>
+<input type = "submit" name="submit" value="submit">
+</form>
+
+<script>
+$('form.ajax').on('submit', function(){
+  var that = $(this),
+      url = "test3.php",
+      type = that.attr('method'),
+      data={};
+    that.find('[name]').each(function(index, value){
+      var that = $(this),
+          name = that.attr('name'),
+          value = that.val();
+
+      data[name] = value;
+    });
+
+$.ajax({
+  url: url,
+  type: type,
+  data: data,
+  success: function(response){
+    //console.log(response);
+$("#fini").text(response);
+//alert(response);
+  }
+});
+  return false;
+});
+
+</script>
+</body>
+</html>
